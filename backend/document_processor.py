@@ -2,14 +2,18 @@ import os
 import pandas as pd
 import PyPDF2
 import docx
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
+from sql_query_engine import SQLQueryEngine
 
 class DocumentProcessor:
     """Process uploaded documents and extract contents for querying"""
     
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str, kb_id: str = None, file_id: str = None):
         self.file_path = file_path
         self.file_extension = os.path.splitext(file_path)[1].lower()
+        self.kb_id = kb_id
+        self.file_id = file_id
+        self.sql_engine = SQLQueryEngine()
         
     def extract_text(self) -> str:
         """Extract text from the document based on file type"""
@@ -24,13 +28,44 @@ class DocumentProcessor:
         else:
             raise ValueError(f"Unsupported file type: {self.file_extension}")
     
+    def process_for_knowledge_base(self) -> Dict[str, Any]:
+        """Process document and prepare it for the knowledge base"""
+        result = {
+            "text": self.extract_text(),
+            "metadata": {}
+        }
+        
+        # Additional processing for tabular files
+        if self.file_extension in ['.csv', '.xlsx', '.xls'] and self.kb_id and self.file_id:
+            try:
+                # Process for SQL queries
+                table_metadata = self.sql_engine.process_tabular_file(
+                    kb_id=self.kb_id,
+                    file_path=self.file_path,
+                    file_id=self.file_id
+                )
+                result["metadata"]["tables"] = table_metadata
+                result["metadata"]["is_tabular"] = True
+            except Exception as e:
+                print(f"Warning: Failed to process tabular file for SQL: {e}")
+        
+        return result
+    
     def extract_from_tabular(self) -> str:
         """Extract data from CSV/Excel files"""
         try:
             if self.file_extension == '.csv':
                 df = pd.read_csv(self.file_path)
             else:
-                df = pd.read_excel(self.file_path)
+                # For Excel, combine all sheets
+                xls = pd.ExcelFile(self.file_path)
+                sheets_text = []
+                
+                for sheet_name in xls.sheet_names:
+                    sheet_df = pd.read_excel(self.file_path, sheet_name=sheet_name)
+                    sheets_text.append(f"Sheet: {sheet_name}\n{sheet_df.to_string()}")
+                
+                return "\n\n".join(sheets_text)
             
             # Convert dataframe to string representation
             return df.to_string()
@@ -42,9 +77,9 @@ class DocumentProcessor:
         try:
             text = ""
             with open(self.file_path, 'rb') as file:
-                reader = PyPDF2.PdfFileReader(file)
-                for page_num in range(reader.numPages):
-                    text += reader.getPage(page_num).extractText() + "\n"
+                reader = PyPDF2.PdfReader(file)
+                for page_num in range(len(reader.pages)):
+                    text += reader.pages[page_num].extract_text() + "\n"
             return text
         except Exception as e:
             raise Exception(f"Error extracting text from PDF: {e}")
