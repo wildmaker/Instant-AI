@@ -1,6 +1,6 @@
 import { Sidebar } from "@/components/sidebar/sidebar"
-import ChatInterface from "@/components/chat/chat-interface"
 import { KnowledgeFileSidebar } from "@/components/sidebar/KnowledgeFileSidebar"
+import { ChatInterface } from "@/components/chat/ChatInterface"
 
 export default function ChatPage() {
   return (

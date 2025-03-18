@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,7 @@ export function CreateKnowledgeModal({ children }: CreateKnowledgeModalProps) {
   const onSubmit = async (values: z.infer<typeof knowledgeSchema>) => {
     try {
       const { id } = await knowledgeApi.create(values);
-      setCreatedKbId(id); // 保存创建的知识库ID
+      setCreatedKbId(id);
       setOpen(false);
     } catch (error) {
       form.setError("root", { message: "创建失败，请检查名称是否重复" });
@@ -59,7 +60,7 @@ export function CreateKnowledgeModal({ children }: CreateKnowledgeModalProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} aria-describedby="dialog-description">
       <DialogTrigger asChild>
         {children ? (
           <div onClick={() => setOpen(true)}>{children}</div>
@@ -77,6 +78,9 @@ export function CreateKnowledgeModal({ children }: CreateKnowledgeModalProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>创建新知识库</DialogTitle>
+          <DialogDescription>
+            在此创建新的知识库，填写名称和简介，然后可以上传相关文件。
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
