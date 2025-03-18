@@ -3,6 +3,10 @@
 import { useState } from "react"
 import { Search, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+
+// 定义侧边栏宽度常量，与主侧边栏保持一致
+const TOPIC_SIDEBAR_WIDTH = "280px";
 
 interface Topic {
   id: string
@@ -11,7 +15,11 @@ interface Topic {
   date?: string
 }
 
-export function TopicSidebar() {
+interface TopicSidebarProps {
+  className?: string;
+}
+
+export function TopicSidebar({ className }: TopicSidebarProps) {
   const [topics, setTopics] = useState<Topic[]>([
     {
       id: "1",
@@ -27,7 +35,7 @@ export function TopicSidebar() {
   ])
 
   return (
-    <div className="flex flex-col h-screen w-64 border-l">
+    <div className={cn("flex flex-col h-screen w-[280px] border-l", className)}>
       <div className="p-4 flex items-center justify-between border-b">
         <h2 className="font-medium">话题</h2>
         <div className="flex items-center">
