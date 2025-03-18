@@ -6,12 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { availableModels, type LLMModel } from "@/types/models"
-
-interface Message {
-  id: string
-  role: "user" | "assistant"
-  content: string
-}
+import { Message } from "@/types/chat"
+import ReactMarkdown from "react-markdown"
+import { HistoryDialog } from "./HistoryDialog"
 
 interface AssistantCard {
   id: string
@@ -21,17 +18,76 @@ interface AssistantCard {
 }
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
+  const initialMessages: Message[] = [
     {
       id: "1",
       role: "assistant",
-      content:
-        "👋 下午好\n\n我是您的私人智能助理 LobeChat，请问现在能帮您做什么？\n\n如果需要获得更加专业或定制的助手，可以点击 + 创建自定义助手",
+      content: "👋 下午好\n\n我是您的私人智能助理 LobeChat，请问现在能帮您做什么？\n\n如果需要获得更加专业或定制的助手，可以点击 + 创建自定义助手",
+      timestamp: Date.now()
     },
-  ])
+  ]
 
+  const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [input, setInput] = useState("")
   const [selectedModel, setSelectedModel] = useState<LLMModel>(availableModels[0])
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false)
+  const [activeFileContent, setActiveFileContent] = useState<string | null>(null)
+
+  const handleSend = () => {
+    if (!input.trim()) return
+    
+    // 添加用户消息
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      timestamp: Date.now()
+    }
+    setMessages([...messages, userMessage])
+    setInput("")
+    
+    // 设置流式输出状态
+    setIsStreaming(true)
+    
+    // 模拟助手回复（延迟以模拟API调用）
+    const assistantId = Date.now() + 1
+    const assistantMessage: Message = {
+      id: assistantId.toString(),
+      role: "assistant",
+      content: "", // 初始为空
+      timestamp: Date.now() + 1
+    }
+    
+    // 添加空消息以开始流式效果
+    setMessages(prev => [...prev, assistantMessage])
+    
+    // 模拟流式回复
+    const response = activeFileContent || "这是一个模拟的助手回复，支持流式输出效果。\n\n可以包含多行内容，并逐步显示。"
+    let displayText = ""
+    let index = 0
+    
+    const interval = setInterval(() => {
+      if (index < response.length) {
+        displayText += response[index]
+        setMessages(prev => 
+          prev.map(msg => 
+            msg.id === assistantId.toString() 
+              ? { ...msg, content: displayText } 
+              : msg
+          )
+        )
+        index++
+      } else {
+        clearInterval(interval)
+        setIsStreaming(false)
+      }
+    }, 50)
+  }
+
+  const handleFileSelect = (file: any) => {
+    setActiveFileContent(file.content)
+  }
 
   const assistantCards: AssistantCard[] = [
     {
@@ -69,7 +125,7 @@ export function ChatInterface() {
             <span className="text-sm">随便聊聊</span>
           </div>
           <div className="flex items-center ml-2 space-x-2 px-3 py-1 bg-gray-100 rounded-md">
-            <span className="text-sm">gpt-4o-mini</span>
+            <span className="text-sm">{selectedModel.id}</span>
           </div>
           <div className="flex items-center ml-2 space-x-2 px-3 py-1 bg-gray-100 rounded-md">
             <Clock className="h-4 w-4" />
@@ -78,6 +134,14 @@ export function ChatInterface() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsHistoryOpen(true)}
+            className={isHistoryOpen ? "bg-blue-50" : ""}
+          >
+            <Clock className="h-5 w-5" />
+          </Button>
           <Button variant="ghost" size="icon">
             <RefreshCw className="h-5 w-5" />
           </Button>
@@ -109,7 +173,9 @@ export function ChatInterface() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <div className="whitespace-pre-line">{message.content}</div>
+                  <div className={`whitespace-pre-line ${isStreaming && message.id === messages[messages.length - 1].id ? "animate-pulse" : ""}`}>
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
 
                   {message.id === "1" && (
                     <>
@@ -140,13 +206,27 @@ export function ChatInterface() {
                 </div>
               </div>
             )}
+            
+            {message.role === "user" && (
+              <div className="flex justify-end">
+                <div className="max-w-[80%] bg-blue-500 text-white p-4 rounded-lg">
+                  <div className="whitespace-pre-line">
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 ml-4">
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <span>U</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
       <div className="border-t p-4">
         <div className="flex items-center space-x-2 mb-2">
-          {/* Model selector button moved to the input area */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -160,7 +240,7 @@ export function ChatInterface() {
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[300px]">
+            <DropdownMenuContent align="start" className="w-[300px] bg-white border shadow-lg">
               {availableModels.map((model) => (
                 <DropdownMenuItem
                   key={model.id}
@@ -228,10 +308,23 @@ export function ChatInterface() {
             placeholder="输入聊天内容..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             rows={1}
+            disabled={isStreaming}
           />
           <div className="ml-2 flex flex-col space-y-2">
-            <Button variant="default" size="icon" className="rounded-full bg-black text-white">
+            <Button 
+              variant="default" 
+              size="icon" 
+              className="rounded-full bg-black text-white" 
+              onClick={handleSend}
+              disabled={isStreaming || !input.trim()}
+            >
               <Send className="h-4 w-4" />
             </Button>
           </div>
@@ -250,6 +343,11 @@ export function ChatInterface() {
           </div>
         </div>
       </div>
+      
+      <HistoryDialog 
+        open={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
+      />
     </div>
   )
 }
