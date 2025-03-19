@@ -149,7 +149,7 @@ export function ChatInterface() {
 
   return (
     <div className="flex flex-col h-screen flex-1">
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b h-[57px]">
         <div className="flex items-center">
           <div className="flex items-center space-x-2 px-3 py-1 bg-gray-100 rounded-md">
             <span className="text-sm">📝</span>
