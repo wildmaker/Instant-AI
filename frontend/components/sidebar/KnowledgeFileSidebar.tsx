@@ -130,7 +130,7 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
       </div>
       
       {/* 知识库详情标题栏 */}
-      <div className="flex items-center justify-between p-4 border-b h-[57px]">
+      <div className="flex items-center justify-between p-4 h-[57px]">
         <div className="flex items-center">
           <div className="w-8 h-8 rounded mr-2 bg-blue-600 flex items-center justify-center">
             <span className="text-white font-bold text-sm">K</span>
