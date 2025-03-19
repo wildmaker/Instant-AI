@@ -148,7 +148,8 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
               </div>
             </div>
           </div>
-        ))
+        ))}
+      </div>
       </div>
     </div>
   )
