@@ -16,6 +16,7 @@ interface KnowledgeFile {
   date?: string
   icon?: string
   isPDF?: boolean
+  url?: string // 新增URL字段用于文件预览链接
 }
 
 interface KnowledgeFileSidebarProps {
@@ -29,42 +30,48 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
       title: "2025年 AI Agent行业报告-20250314-最终版",
       type: "PDF",
       date: "2025.03.14",
-      isPDF: true
+      isPDF: true,
+      url: "/sample.pdf"
     },
     {
       id: "2",
       title: "2025具身智能技术应用发展报告（一）0.2",
       type: "PDF",
       date: "2025.03.10",
-      isPDF: true
+      isPDF: true,
+      url: "/sample.pdf"
     },
     {
       id: "3",
       title: "2025OpenStack开放AI服务生态系统.pdf",
       type: "PDF",
       date: "2025.02.28",
-      isPDF: true
+      isPDF: true,
+      url: "/report.pdf"
     },
     {
       id: "4",
       title: "宇创科技-信息化规划.pdf",
       type: "PDF",
       date: "2025.01.15",
-      isPDF: true
+      isPDF: true,
+      url: "/contract.pdf"
     },
     {
       id: "5",
       title: "智能不冷-CYANGUPSETS-2025.pdf",
       type: "PDF",
       date: "2025.01.05",
-      isPDF: true
+      isPDF: true,
+      url: "/sample.pdf"
     },
     {
       id: "6",
       title: "AGI思考发展.黑桥研究院_2025.01.V1.0",
       type: "PDF",
       date: "2025.01.01",
-      isPDF: true
+      isPDF: true,
+      url: "/report.pdf"
     },
   ])
 
@@ -123,7 +130,11 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
         </div>
 
         {files.map((file) => (
-          <div key={file.id} className="mx-4 my-2 p-3 rounded-lg hover:bg-gray-100 cursor-pointer">
+          <div 
+            key={file.id} 
+            className="mx-4 my-2 p-3 rounded-lg hover:bg-gray-100 cursor-pointer"
+            onClick={() => file.url && window.open(file.url, '_blank')}
+          >
             <div className="flex items-start">
               <div className={`w-10 h-12 ${getRandomColor(file.id)} rounded flex items-center justify-center mr-3`}>
                 <span className="text-white font-bold text-xs">PDF</span>
@@ -137,7 +148,7 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
               </div>
             </div>
           </div>
-        ))}
+        ))
       </div>
     </div>
   )

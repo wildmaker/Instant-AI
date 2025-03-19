@@ -27,7 +27,6 @@ export function ChatInterface() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false)
   const [activeFileContent, setActiveFileContent] = useState<string | null>(null)
-  const [isFilesVisible, setIsFilesVisible] = useState(true)
 
   const handleSend = () => {
     if (!input.trim()) return
@@ -148,10 +147,6 @@ export function ChatInterface() {
     setIsHistoryOpen(!isHistoryOpen);
   }
 
-  const toggleFilesVisibility = () => {
-    setIsFilesVisible(!isFilesVisible);
-  }
-
   return (
     <div className="flex flex-col h-screen flex-1">
       <div className="flex items-center justify-between p-4 border-b">
@@ -201,86 +196,25 @@ export function ChatInterface() {
         </div>
       </div>
 
-      {/* 主内容区域 - 添加flex布局支持右侧文件列表 */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* 聊天区域 */}
-        <div className="flex-1 overflow-y-auto">
-          {messages.length === 0 ? (
-            <div className="p-6">
-              <WelcomeMessage 
-                assistantCards={assistantCards}
-                commonQuestions={commonQuestions}
-                onSelectQuestion={handleSelectQuestion}
-                onRefreshCards={handleRefreshCards}
-              />
-            </div>
-          ) : (
-            <ChatMessageList
-              messages={messages.map(msg => ({
-                role: msg.role as "user" | "assistant",
-                content: msg.content,
-                timestamp: msg.timestamp,
-              }))}
-              isStreaming={isStreaming}
+      <div className="flex-1 overflow-y-auto">
+        {messages.length === 0 ? (
+          <div className="p-6">
+            <WelcomeMessage 
+              assistantCards={assistantCards}
+              commonQuestions={commonQuestions}
+              onSelectQuestion={handleSelectQuestion}
+              onRefreshCards={handleRefreshCards}
             />
-          )}
-        </div>
-
-        {/* 右侧文件列表 */}
-        {isFilesVisible && (
-          <div className="w-80 border-l border-gray-200 bg-gray-50 overflow-y-auto">
-            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="font-medium">全部文件</h3>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-7 w-7" 
-                onClick={toggleFilesVisibility}
-              >
-                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M8.84182 3.13514C9.04327 3.32401 9.05348 3.64042 8.86462 3.84188L5.43521 7.49991L8.86462 11.1579C9.05348 11.3594 9.04327 11.6758 8.84182 11.8647C8.64036 12.0535 8.32394 12.0433 8.13508 11.8419L4.38508 7.84188C4.20477 7.64955 4.20477 7.35027 4.38508 7.15794L8.13508 3.15794C8.32394 2.95648 8.64036 2.94628 8.84182 3.13514Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </Button>
-            </div>
-            <div className="p-4">
-              <div className="space-y-3">
-                <div 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
-                  onClick={() => window.open('/sample.pdf', '_blank')}
-                >
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm truncate">sample.pdf</span>
-                </div>
-                <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                  <FileText className="h-4 w-4 text-green-500" />
-                  <span className="text-sm truncate">project_notes.docx</span>
-                </div>
-                <div 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
-                  onClick={() => window.open('/report.pdf', '_blank')}
-                >
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm truncate">report.pdf</span>
-                </div>
-                <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
-                  <FileText className="h-4 w-4 text-yellow-500" />
-                  <span className="text-sm truncate">presentation.pptx</span>
-                </div>
-                <div 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
-                  onClick={() => window.open('/contract.pdf', '_blank')}
-                >
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="text-sm truncate">contract.pdf</span>
-                </div>
-              </div>
-            </div>
           </div>
+        ) : (
+          <ChatMessageList
+            messages={messages.map(msg => ({
+              role: msg.role as "user" | "assistant",
+              content: msg.content,
+              timestamp: msg.timestamp,
+            }))}
+            isStreaming={isStreaming}
+          />
         )}
       </div>
 
