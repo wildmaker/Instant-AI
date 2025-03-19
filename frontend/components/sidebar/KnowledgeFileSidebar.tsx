@@ -124,6 +124,12 @@ export function KnowledgeFileSidebar({ className }: KnowledgeFileSidebarProps) {
 
   return (
     <div className={cn("flex flex-col h-screen w-[360px] border-l", className)}>
+      {/* 顶部标题栏 - 知识库 */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <h1 className="text-xl font-bold">知识库</h1>
+      </div>
+      
+      {/* 知识库详情标题栏 */}
       <div className="p-4 flex items-center justify-between border-b">
         <div className="flex items-center">
           <div className="w-8 h-8 rounded mr-2 bg-blue-600 flex items-center justify-center">
