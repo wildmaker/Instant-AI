@@ -5,6 +5,9 @@ import WorkspaceThread from "@/models/workspaceThread";
 import { v4 } from "uuid";
 import { ABORT_STREAM_EVENT } from "@/utils/chat";
 
+// 默认工作区的存储键
+const DEFAULT_WORKSPACE_KEY = "anythingllm-default-workspace-id";
+
 const Workspace = {
   workspaceOrderStorageKey: "anythingllm-workspace-order",
 
@@ -214,13 +217,24 @@ const Workspace = {
     return workspaces;
   },
   bySlug: async function (slug = "") {
-    const workspace = await fetch(`${API_BASE}/workspace/${slug}`, {
-      headers: baseHeaders(),
-    })
-      .then((res) => res.json())
-      .then((res) => res.workspace)
-      .catch(() => null);
-    return workspace;
+    console.log(`Workspace.bySlug: Fetching workspace with slug "${slug}"`);
+    try {
+      const response = await fetch(`${API_BASE}/workspace/${slug}`, {
+        headers: baseHeaders(),
+      });
+      console.log("Workspace.bySlug: Response status:", response.status);
+      if (!response.ok) {
+        console.error("Workspace.bySlug: Error response", response);
+        return null;
+      }
+      
+      const data = await response.json();
+      console.log("Workspace.bySlug: Response data:", data);
+      return data.workspace;
+    } catch (error) {
+      console.error("Workspace.bySlug: Error:", error);
+      return null;
+    }
   },
   delete: async function (slug) {
     const result = await fetch(`${API_BASE}/workspace/${slug}`, {
@@ -496,16 +510,68 @@ const Workspace = {
    * @returns {Array} - ordered workspaces
    */
   orderWorkspaces: function (workspaces = []) {
+    // 获取默认工作区ID
+    const defaultWorkspaceId = localStorage.getItem(DEFAULT_WORKSPACE_KEY);
+    
+    // 获取工作区排序顺序
     const workspaceOrderPreference =
       safeJsonParse(localStorage.getItem(this.workspaceOrderStorageKey)) || [];
-    if (workspaceOrderPreference.length === 0) return workspaces;
+    
+    // 如果没有自定义排序，直接使用默认排序
+    if (workspaceOrderPreference.length === 0 && !defaultWorkspaceId) return workspaces;
+    
     const orderedWorkspaces = Array.from(workspaces);
-    orderedWorkspaces.sort(
-      (a, b) =>
+    
+    // 对工作区进行排序，但默认工作区始终位于顶部
+    orderedWorkspaces.sort((a, b) => {
+      // 如果a是默认工作区，它应该排在前面
+      if (a.id.toString() === defaultWorkspaceId) return -1;
+      // 如果b是默认工作区，它应该排在前面
+      if (b.id.toString() === defaultWorkspaceId) return 1;
+      
+      // 否则按照正常顺序排序
+      return (
         workspaceOrderPreference.indexOf(a.id) -
         workspaceOrderPreference.indexOf(b.id)
-    );
+      );
+    });
+    
     return orderedWorkspaces;
+  },
+  
+  // 获取默认工作区
+  getDefaultWorkspace: async function () {
+    const workspaces = await this.all();
+    if (!workspaces || workspaces.length === 0) return null;
+    
+    // 获取本地存储的默认工作区ID
+    const defaultWorkspaceId = localStorage.getItem(DEFAULT_WORKSPACE_KEY);
+    
+    // 如果有默认工作区ID，尝试找到对应的工作区
+    if (defaultWorkspaceId) {
+      const defaultWorkspace = workspaces.find(w => w.id.toString() === defaultWorkspaceId);
+      if (defaultWorkspace) return defaultWorkspace;
+    }
+    
+    // 如果没有默认工作区或找不到匹配的，使用第一个作为默认
+    const firstWorkspace = workspaces[0];
+    
+    // 将第一个工作区设置为默认工作区
+    localStorage.setItem(DEFAULT_WORKSPACE_KEY, firstWorkspace.id.toString());
+    
+    return firstWorkspace;
+  },
+  
+  // 设置默认工作区
+  setDefaultWorkspace: function (workspaceId) {
+    localStorage.setItem(DEFAULT_WORKSPACE_KEY, workspaceId.toString());
+    return true;
+  },
+  
+  // 检查是否为默认工作区
+  isDefaultWorkspace: function (workspaceId) {
+    const defaultWorkspaceId = localStorage.getItem(DEFAULT_WORKSPACE_KEY);
+    return defaultWorkspaceId === workspaceId.toString();
   },
 
   threads: WorkspaceThread,

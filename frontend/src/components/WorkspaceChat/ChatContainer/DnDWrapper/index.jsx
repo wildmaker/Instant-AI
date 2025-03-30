@@ -201,59 +201,54 @@ export function DnDFileUploaderProvider({ workspace, children }) {
 
   return (
     <DndUploaderContext.Provider
-      value={{ files, ready, dragging, setDragging, onDrop, parseAttachments }}
+      value={{ files, ready, dragging, setDragging, onDrop, parseAttachments, embedEligibleAttachments }}
     >
       {children}
     </DndUploaderContext.Provider>
   );
 }
 
-export default function DnDFileUploaderWrapper({ children }) {
-  const { onDrop, ready, dragging, setDragging } =
-    useContext(DndUploaderContext);
-  const { getRootProps, getInputProps } = useDropzone({
+export default function DnDFileUploaderWrapper({ children, className = "" }) {
+  const {
+    files,
+    ready,
+    dragging,
+    setDragging,
     onDrop,
-    disabled: !ready,
-    noClick: true,
-    noKeyboard: true,
-    onDragEnter: () => setDragging(true),
-    onDragLeave: () => setDragging(false),
+    parseAttachments,
+    embedEligibleAttachments
+  } = useContext(DndUploaderContext);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    onDragEnter: () => {
+      setDragging(true);
+    },
+    onDragLeave: () => {
+      setDragging(false);
+    },
+    noClick: true
   });
-  const { user } = useUser();
-  const canUploadAll = !user || user?.role !== "default";
 
   return (
     <div
-      className={`relative flex flex-col h-full w-full md:mt-0 mt-[40px] p-[1px]`}
+      className={`h-full w-full relative ${className}`}
       {...getRootProps()}
     >
-      <div
-        hidden={!dragging}
-        className="absolute top-0 w-full h-full bg-dark-text/90 light:bg-[#C2E7FE]/90 rounded-2xl border-[4px] border-white z-[9999]"
-      >
-        <div className="w-full h-full flex justify-center items-center rounded-xl">
-          <div className="flex flex-col gap-y-[14px] justify-center items-center">
-            <img src={DndIcon} width={69} height={69} />
-            <p className="text-white text-[24px] font-semibold">
-              Add {canUploadAll ? "anything" : "an image"}
-            </p>
-            <p className="text-white text-[16px] text-center">
-              {canUploadAll ? (
-                <>
-                  Drop your file here to embed it into your <br />
-                  workspace auto-magically.
-                </>
-              ) : (
-                <>
-                  Drop your image here to chat with it <br />
-                  auto-magically.
-                </>
-              )}
-            </p>
-          </div>
+      <input {...getInputProps()} />
+      {isDragActive && (
+        <div className="absolute inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50 rounded-lg text-white">
+          <img
+            src={DndIcon}
+            alt="Drag and drop icon"
+            className="h-24 w-auto mb-4"
+          />
+          <p className="text-lg">Drop your file here to upload it</p>
+          <small>
+            We accept PDFs, Word Documents, PowerPoint, Excel, Text, LaTex,
+            Images, and AI/ML model cards.
+          </small>
         </div>
-      </div>
-      <input id="dnd-chat-file-uploader" {...getInputProps()} />
+      )}
       {children}
     </div>
   );

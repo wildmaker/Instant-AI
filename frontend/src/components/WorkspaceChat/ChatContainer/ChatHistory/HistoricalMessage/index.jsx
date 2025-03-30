@@ -77,9 +77,11 @@ const HistoricalMessage = ({
       onAnimationEnd={onEndAnimation}
       className={`${
         isDeleted ? "animate-remove" : ""
-      } flex justify-center items-end w-full group bg-theme-bg-chat`}
+      } flex justify-center items-end w-full group ${
+        role === "user" ? "justify-end" : "bg-theme-bg-chat"
+      }`}
     >
-      <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+      <div className="py-8 px-4 w-full flex gap-x-5 flex-col">
         <div className={`flex gap-x-5 ${alignmentCls}`}>
           <div className="flex flex-col items-center">
             <ProfileImage role={role} workspace={workspace} />
@@ -103,7 +105,7 @@ const HistoricalMessage = ({
               saveChanges={saveEditedMessage}
             />
           ) : (
-            <div className="break-words">
+            <div className={`break-words ${role === "user" ? "bg-theme-message-bubble-user text-white light:text-theme-text-primary px-4 py-3 rounded-2xl rounded-tr-sm border border-transparent transition-all duration-300" : ""}`}>
               <RenderChatContent
                 role={role}
                 message={message}

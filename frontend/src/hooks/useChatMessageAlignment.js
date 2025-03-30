@@ -16,8 +16,9 @@ export function useChatMessageAlignment() {
 
   const getMessageAlignment = useCallback(
     (role) => {
-      const isLeftToRight = role === "user" && msgDirection === "left_right";
-      return isLeftToRight ? "flex-row-reverse" : "";
+      // 如果是用户消息，始终放在右侧，使用flex-row-reverse
+      // 如果是助手消息，保持在左侧
+      return role === "user" ? "flex-row-reverse" : "";
     },
     [msgDirection]
   );

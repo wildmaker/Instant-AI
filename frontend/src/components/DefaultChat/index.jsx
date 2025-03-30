@@ -237,7 +237,7 @@ export default function DefaultChatContainer() {
 function MessageContainer({ children }) {
   return (
     <div className="flex justify-center items-end w-full">
-      <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+      <div className="py-6 px-4 w-full flex gap-x-5 flex-col">
         {children}
       </div>
     </div>
@@ -245,7 +245,15 @@ function MessageContainer({ children }) {
 }
 
 function MessageContent({ children, alignmentCls = "" }) {
-  return <div className={`flex gap-x-5 ${alignmentCls}`}>{children}</div>;
+  const isUser = alignmentCls.includes("flex-row-reverse");
+  return (
+    <div className={`flex gap-x-5 ${alignmentCls}`}>
+      {children[0]}
+      <div className={`${isUser ? "bg-theme-message-bubble-user text-white light:text-theme-text-primary px-4 py-3 rounded-2xl rounded-tr-sm border border-transparent transition-all duration-300" : "bg-theme-bg-chat text-white light:text-theme-text-primary px-4 py-3 rounded-2xl rounded-tl-sm border border-transparent transition-all duration-300"}`}>
+        {children[1]}
+      </div>
+    </div>
+  );
 }
 
 function MessageText({ children }) {

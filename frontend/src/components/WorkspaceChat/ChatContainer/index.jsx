@@ -19,8 +19,9 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import { ChatTooltips } from "./ChatTooltips";
 import { MetricsProvider } from "./ChatHistory/HistoricalMessage/Actions/RenderMetrics";
+import { FileText } from "@phosphor-icons/react";
 
-export default function ChatContainer({ workspace, knownHistory = [] }) {
+export default function ChatContainer({ workspace, knownHistory = [], showSidebar = true, toggleSidebar }) {
   const { threadSlug = null } = useParams();
   const [message, setMessage] = useState("");
   const [loadingResponse, setLoadingResponse] = useState(false);
@@ -28,6 +29,9 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
   const [socketId, setSocketId] = useState(null);
   const [websocket, setWebsocket] = useState(null);
   const { files, parseAttachments } = useContext(DndUploaderContext);
+
+  console.log("Workspace data:", workspace);
+  console.log("Thread slug:", threadSlug);
 
   // Maintain state of message from whatever is in PromptInput
   const handleMessageChange = (event) => {
@@ -263,30 +267,35 @@ export default function ChatContainer({ workspace, knownHistory = [] }) {
   }, [socketId]);
 
   return (
-    <div
-      style={{ height: isMobile ? "100%" : "calc(100% - 32px)" }}
-      className="transition-all duration-500 relative md:ml-[2px] md:mr-[16px] md:my-[16px] md:rounded-[16px] bg-theme-bg-secondary w-full h-full overflow-y-scroll no-scroll z-[2]"
-    >
-      {isMobile && <SidebarMobileHeader />}
-      <DnDFileUploaderWrapper>
-        <MetricsProvider>
-          <ChatHistory
-            history={chatHistory}
-            workspace={workspace}
+    <div className="flex flex-col h-full w-full bg-theme-bg-tertiary overflow-hidden" style={{ backgroundColor: "var(--theme-bg-chat)" }}>
+      {isMobile && <SidebarMobileHeader setSidebarOpen={() => toggleSidebar?.()} sidebarOpen={showSidebar} />}
+      <DnDFileUploaderWrapper className="flex flex-col h-full overflow-hidden" style={{ backgroundColor: "var(--theme-bg-chat)" }}>
+        <div className="flex-grow overflow-y-auto overflow-x-hidden w-full" style={{ backgroundColor: "var(--theme-bg-chat)" }}>
+          <MetricsProvider>
+            <ChatHistory
+              workspace={workspace}
+              history={chatHistory}
+              loading={loadingResponse}
+              setHistory={setChatHistory}
+              chatModel={workspace?.chatModel}
+              sendCommand={sendCommand}
+              regenerateAssistantMessage={regenerateAssistantMessage}
+              hasAttachments={files.length > 0}
+            />
+          </MetricsProvider>
+        </div>
+
+        <div className="flex-shrink-0 border-t border-theme-sidebar-border bg-theme-bg-tertiary" style={{ minHeight: "105px" }}>
+          <PromptInput
+            submit={handleSubmit}
+            onChange={handleMessageChange}
+            isStreaming={loadingResponse}
             sendCommand={sendCommand}
-            updateHistory={setChatHistory}
-            regenerateAssistantMessage={regenerateAssistantMessage}
-            hasAttachments={files.length > 0}
+            attachments={files}
           />
-        </MetricsProvider>
-        <PromptInput
-          submit={handleSubmit}
-          onChange={handleMessageChange}
-          isStreaming={loadingResponse}
-          sendCommand={sendCommand}
-          attachments={files}
-        />
+        </div>
       </DnDFileUploaderWrapper>
+
       <ChatTooltips />
     </div>
   );

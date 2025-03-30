@@ -28,7 +28,7 @@ const PromptReply = ({
       <div
         className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
       >
-        <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+        <div className="py-6 px-4 w-full flex gap-x-5 flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
             <div className="mt-3 ml-5 dot-falling light:invert"></div>
@@ -43,7 +43,7 @@ const PromptReply = ({
       <div
         className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
       >
-        <div className="py-6 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+        <div className="py-6 px-4 w-full flex gap-x-5 flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
             <span
@@ -64,13 +64,15 @@ const PromptReply = ({
       key={uuid}
       className={`flex justify-center items-end w-full ${assistantBackgroundColor}`}
     >
-      <div className="py-8 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+      <div className="py-8 px-4 w-full flex gap-x-5 flex-col">
         <div className="flex gap-x-5">
           <WorkspaceProfileImage workspace={workspace} />
-          <RenderAssistantChatContent
-            key={`${uuid}-prompt-reply-content`}
-            message={reply}
-          />
+          <div className="bg-theme-bg-chat px-4 py-3 rounded-2xl rounded-tl-sm">
+            <RenderAssistantChatContent
+              key={`${uuid}-prompt-reply-content`}
+              message={reply}
+            />
+          </div>
         </div>
         <Citations sources={sources} />
       </div>

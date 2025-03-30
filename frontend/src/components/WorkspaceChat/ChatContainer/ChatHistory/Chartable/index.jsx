@@ -388,18 +388,11 @@ export function Chartable({ props, workspace }) {
   if (!!props.chatId) {
     return (
       <div className="flex justify-center items-end w-full">
-        <div className="py-2 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
+        <div className="py-2 px-4 w-full flex gap-x-5 flex-col">
           <div className="flex gap-x-5">
             <WorkspaceProfileImage workspace={workspace} />
-            <div className="relative w-full">
-              <DownloadGraph onClick={handleDownload} />
-              <div ref={ref}>{renderChart()}</div>
-              <span
-                className={`flex flex-col gap-y-1 mt-2`}
-                dangerouslySetInnerHTML={{
-                  __html: renderMarkdown(content.caption),
-                }}
-              />
+            <div className="bg-theme-bg-chat px-4 py-3 rounded-2xl rounded-tl-sm w-full">
+              <Graph height={height} width={width} data={data} />
             </div>
           </div>
         </div>
@@ -409,10 +402,10 @@ export function Chartable({ props, workspace }) {
 
   return (
     <div className="flex justify-center items-end w-full">
-      <div className="py-2 px-4 w-full flex gap-x-5 md:max-w-[80%] flex-col">
-        <div className="relative w-full">
+      <div className="py-2 px-4 w-full flex gap-x-5 flex-col">
+        <div className="relative w-full bg-theme-bg-chat px-4 py-3 rounded-2xl rounded-tl-sm">
           <DownloadGraph onClick={handleDownload} />
-          <div ref={ref}>{renderChart()}</div>
+          <Graph height={height} width={width} data={data} />
         </div>
         <div className="flex gap-x-5">
           <span

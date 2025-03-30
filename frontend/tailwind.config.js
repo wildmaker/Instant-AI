@@ -97,6 +97,9 @@ export default {
           },
           "file-picker": {
             hover: 'var(--theme-file-picker-hover)',
+          },
+          "message": {
+            "bubble-user": 'var(--theme-message-bubble-user)',
           }
         },
       },

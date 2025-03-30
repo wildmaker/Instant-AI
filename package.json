@@ -31,5 +31,8 @@
   "private": false,
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "react-transition-group": "^4.4.5"
   }
 }

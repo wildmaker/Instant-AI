@@ -1,3 +1,64 @@
+# Instant-AI
+
+基于AnythingLLM定制的企业级本地知识库和大语言模型应用平台，支持多种模型接入，提供优化的用户界面和工作流程。
+
+## 特点
+
+- 💼 **专为企业设计**：文档管理、权限控制和安全性
+- 🖥️ **本地部署**：保护数据私密性，满足企业合规需求
+- 🧠 **多模型支持**：兼容市面上主流开源和商业大语言模型
+- 📄 **强大的文档处理**：支持多种文档格式，智能向量化和检索
+- 🔍 **高效搜索**：优化的RAG检索架构，提供精准搜索结果
+- 👥 **多用户支持**：团队协作，权限管理
+- 🌐 **跨平台**：兼容主流操作系统和浏览器
+
+## 快速开始
+
+### 使用Docker（推荐）
+
+```bash
+docker run -d \
+  -p 3001:3001 \
+  -v ./instant-ai-data:/app/server/storage \
+  --name instant-ai \
+  wildmaker/instant-ai:latest
+```
+
+访问 http://localhost:3001 开始使用。
+
+### 手动安装
+
+请参阅 [BARE_METAL.md](BARE_METAL.md) 获取详细的手动安装指南。
+
+## 系统要求
+
+- 最低2GB内存，推荐4GB及以上
+- 至少10GB存储空间
+- 64位操作系统
+
+## 技术栈
+
+- 前端：React, Next.js, Tailwind CSS
+- 后端：Node.js, Express
+- 向量存储：支持多种向量数据库
+- 数据库：SQLite (默认)，PostgreSQL (可选)
+
+## 文档
+
+详细文档请访问 [项目文档](https://docs.instant-ai.com)
+
+## 贡献
+
+欢迎对Instant-AI项目做出贡献！请查阅 [CONTRIBUTING.md](CONTRIBUTING.md) 了解更多信息。
+
+## 开源协议
+
+本项目基于 [MIT 许可证](LICENSE) 开源。
+
+## 鸣谢
+
+本项目基于 [AnythingLLM](https://github.com/Mintplex-Labs/anything-llm) 开发，感谢原项目团队的贡献。
+
 <a name="readme-top"></a>
 
 <p align="center">
